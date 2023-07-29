@@ -5,11 +5,9 @@ services:
     image: nginx:latest
     container_name: nginx
     ports:
-      - 443:443
+      - 80:80
     volumes:
-      - /opt/nginx/yourhost.xyz.key:/etc/nginx/yourhost.xyz.key:ro
-      - /opt/nginx/yourhost.xyz.crt:/etc/nginx/yourhost.xyz.crt:ro
-      - /opt/nginx/sonarqube.conf:/etc/nginx/conf.d/sonarqube.conf:z
+      - nginx_conf:/etc/nginx/conf.d:z
     networks:
       - sonarnet
     restart: always
@@ -20,12 +18,11 @@ services:
     networks:
       - sonarnet
     environment:
-      - POSTGRES_USER=xxxx
-      - POSTGRES_PASSWORD=xxxx
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=sonarqube
     volumes:
-      - /opt/postgresql:/var/lib/postgresql:z
-      - /opt/postgresql/data:/var/lib/postgresql/data:z
+      - postgresql_data:/var/lib/postgresql:z
 
   sonarqube:
     image: sonarqube:latest
@@ -40,11 +37,19 @@ services:
     environment:
       - sonar.jdbc.url=jdbc:postgresql://database:5432/sonarqube
     volumes:
-      - /opt/sonarqube/conf:/opt/sonarqube/conf:z
-      - /opt/sonarqube/extensions/plugins:/opt/sonarqube/extensions/plugins:z
-      - /opt/sonarqube/extensions/downloads:/opt/sonarqube/extensions/downloads:z
-      - /opt/sonarqube/data:/opt/sonarqube/data:z
+      - sonarqube_conf:/opt/sonarqube/conf:z
+      - sonarqube_extensions_plugins:/opt/sonarqube/extensions/plugins:z
+      - sonarqube_extensions_downloads:/opt/sonarqube/extensions/downloads:z
+      - sonarqube_data:/opt/sonarqube/data:z
 
 networks:
   sonarnet:
     driver: bridge
+
+volumes:
+  nginx_conf:
+  postgresql_data:
+  sonarqube_conf:
+  sonarqube_extensions_plugins:
+  sonarqube_extensions_downloads:
+  sonarqube_data:
